@@ -1,0 +1,15 @@
+# Example ~/.mavenrc — copy to ~/.mavenrc and adjust paths (not used by default).
+#
+# Maven sources this file before every mvn invocation on Unix/Linux/macOS.
+# See docs/BUILD-AND-RUN.md for full setup.
+
+# JDK 17 for this project
+export JAVA_HOME=/usr/lib/jvm/java-17-openjdk
+
+# Optional: custom trust store if packages.redhat.com uses a private CA
+# export MAVEN_OPTS="${MAVEN_OPTS} \
+#   -Djavax.net.ssl.trustStore=${HOME}/.certs/lightwell/truststore.jks \
+#   -Djavax.net.ssl.trustStorePassword=changeit"
+
+# Optional: default to this project's settings.xml (machine-local convenience)
+# export MAVEN_ARGS="-s ${HOME}/path/to/lw-spring-boot-poc/settings.xml"

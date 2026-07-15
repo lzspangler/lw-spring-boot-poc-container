@@ -1,0 +1,15 @@
+---
+description: Core Spring Boot LW POC context — stack, layers, and doc map
+alwaysApply: true
+---
+
+# Spring Boot LW POC
+
+- Spring Boot **2.7.18**, Java **17**, Maven. GroupId `com.redhat.lightwell`. Do not upgrade without explicit request.
+- Layered architecture: controller → service → repository → model.
+- **API-first:** edit `openapi/openapi.yaml` before HTTP code; run `mvn -s settings.xml openapi-generator:generate`.
+- Constructor injection; thin controllers; business logic in services.
+- **Maven:** always `mvn -s settings.xml <goal>`; set `LW_USERNAME` and `LW_PASSWORD` for Lightwell repos.
+- Commands: `mvn -s settings.xml clean verify`, `spring-boot:run`, `test`, `openapi-generator:generate`.
+- Detailed rules: [AGENTS.md](../../AGENTS.md) and [docs/](../../docs/) (uppercase filenames, emoji headings).
+- Do not commit secrets. Do not create git commits unless the user asks.
