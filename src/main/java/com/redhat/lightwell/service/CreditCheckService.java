@@ -53,7 +53,7 @@ public class CreditCheckService {
                     status = score >= 700 ? "GOOD" : score >= 500 ? "FAIR" : "POOR";
                 }
             }
-        } catch (IOException e) {
+        } catch (Exception e) {
             score = generateFallbackScore(customer);
             status = score >= 700 ? "GOOD" : score >= 500 ? "FAIR" : "POOR";
         }
