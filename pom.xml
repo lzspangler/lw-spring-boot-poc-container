@@ -129,7 +129,7 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
-            <version>${spring.boot.version}.rhlw-00002</version>
+            <version>${spring.boot.version}.rhlw-00004</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.security</groupId>
