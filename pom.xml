@@ -15,7 +15,7 @@
     <artifactId>spring-boot-lw-poc</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>spring-boot-lw-poc</name>
-    <description>Simple Spring Boot proof of concept</description>
+    <description>Retail banking Spring Boot proof of concept</description>
 
     <properties>
         <java.version>17</java.version>
@@ -34,45 +34,47 @@
             <groupId>com.fasterxml.jackson.jakarta.rs</groupId>
             <artifactId>jackson-jakarta-rs-json-provider</artifactId>
             <version>${jackson.version}</version>
-        </dependency>        
-        <!-- Springframework dependencies -->
-        <dependency>
-            <groupId>org.springframework.security</groupId>
-            <artifactId>spring-security-core</artifactId>
-            <!-- Uncomment this line to use the remediated dependency -->
-            <!-- <version>5.7.11.rhlw-00005</version> -->
         </dependency>
+        <!-- Springframework dependencies -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot</artifactId>
-            <!-- Uncomment this line to use the remediated dependency -->
-            <!-- <version>${spring.boot.version}.rhlw-00003</version> -->
+            <version>${spring.boot.version}.rhlw-00003</version>
         </dependency>
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-core</artifactId>
-            <version>${spring.core.version}</version>
-            <!-- Uncomment this line to use the remediated dependency -->
-            <!-- <version>${spring.core.version}.rhlw-00003</version> -->
-        </dependency>
+        <!-- spring-core version managed by parent BOM to avoid incompatibility with spring-aop/spring-tx -->
+
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
-            <!-- Uncomment this line to use the remediated dependency -->
-            <!-- <version>${spring.boot.version}.rhlw-00003</version> -->
+            <version>${spring.boot.version}.rhlw-00003</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-validation</artifactId>
-            <!-- Uncomment this line to use the remediated dependency -->
-            <!-- <version>${spring.boot.version}.rhlw-00003</version> -->
+            <version>${spring.boot.version}.rhlw-00003</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web-services</artifactId>
-            <!-- Uncomment this line to use the remediated dependency -->
-            <!-- <version>2.7.18.rhlw-00002</version> -->
-        </dependency>        
+            <version>2.7.18.rhlw-00002</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-jpa</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-security</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <scope>runtime</scope>
+        </dependency>
         <dependency>
             <groupId>org.springdoc</groupId>
             <artifactId>springdoc-openapi-ui</artifactId>
@@ -83,8 +85,12 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
-            <!-- Uncomment this line to use the remediated dependency -->
-            <!-- <version>${spring.boot.version}.rhlw-00002</version> -->
+            <version>${spring.boot.version}.rhlw-00002</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-test</artifactId>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 
@@ -114,7 +120,7 @@
                     <inputSpec>${project.basedir}/openapi/openapi.yaml</inputSpec>
                     <generatorName>spring</generatorName>
                     <apiPackage>com.redhat.lightwell.api</apiPackage>
-                    <modelPackage>com.redhat.lightwell.model</modelPackage>
+                    <modelPackage>com.redhat.lightwell.api.model</modelPackage>
                     <invokerPackage>com.redhat.lightwell.invoker</invokerPackage>
                     <output>${project.build.directory}/generated-sources/openapi</output>
                     <configOptions>

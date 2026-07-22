@@ -1,72 +1,588 @@
 openapi: 3.0.3
 info:
-  title: Spring Boot LW POC API
+  title: Retail Banking API
   description: |
-    HTTP API for the Red Hat Lightwell Spring Boot proof of concept.
+    Enterprise retail banking API for the Red Hat Lightwell Spring Boot proof of concept.
 
     This file is the **single source of truth** for the public REST contract.
-    Update this specification **before** implementing or changing controllers, DTOs,
-    or service method signatures. Run the OpenAPI Generator Maven goal to scaffold
-    new endpoints or align existing code with the contract (see docs/API.md).
-  version: 0.0.1-SNAPSHOT
+    Provides customer management, account operations, financial transactions,
+    and inter-account transfers.
+  version: 1.0.0-SNAPSHOT
   contact:
     name: Lightwell POC team
 
 servers:
   - url: http://localhost:8080
-    description: Local development (default port from application.properties)
+    description: Local development
 
 tags:
-  - name: Greetings
-    description: Personalized greeting messages for API consumers
+  - name: Customers
+    description: Customer management
+  - name: Accounts
+    description: Account management and balance inquiries
+  - name: Transactions
+    description: Financial transactions — deposits, withdrawals, transfers
 
 paths:
-  /api/greetings:
+  /api/customers:
     get:
-      tags:
-        - Greetings
-      operationId: getGreeting
-      summary: Return a personalized greeting
-      description: |
-        Returns a JSON greeting for an optional user name.
-
-        When `name` is omitted, blank, or contains only whitespace, the service
-        uses the default name `World` and responds with `Hello, World!`.
-        Non-blank values are trimmed before formatting the message.
-      parameters:
-        - name: name
-          in: query
-          required: false
-          description: Display name of the user to greet.
-          schema:
-            type: string
-            example: Alice
+      tags: [Customers]
+      operationId: listCustomers
+      summary: List all customers
       responses:
         '200':
-          description: Greeting generated successfully.
+          description: List of customers
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/GreetingResponse'
-              examples:
-                defaultGreeting:
-                  summary: Default greeting (no name)
-                  value:
-                    message: "Hello, World!"
-                personalizedGreeting:
-                  summary: Personalized greeting
-                  value:
-                    message: "Hello, Alice!"
+                type: array
+                items:
+                  $ref: '#/components/schemas/CustomerResponse'
+    post:
+      tags: [Customers]
+      operationId: createCustomer
+      summary: Create a new customer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateCustomerRequest'
+      responses:
+        '201':
+          description: Customer created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomerResponse'
+        '400':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Duplicate email
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/customers/{id}:
+    get:
+      tags: [Customers]
+      operationId: getCustomer
+      summary: Get a customer by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Customer found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomerResponse'
+        '404':
+          description: Customer not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    put:
+      tags: [Customers]
+      operationId: updateCustomer
+      summary: Update a customer
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateCustomerRequest'
+      responses:
+        '200':
+          description: Customer updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomerResponse'
+        '404':
+          description: Customer not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/customers/{customerId}/accounts:
+    get:
+      tags: [Customers]
+      operationId: getCustomerAccounts
+      summary: List accounts for a customer
+      parameters:
+        - name: customerId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: List of accounts
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/AccountResponse'
+        '404':
+          description: Customer not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/accounts:
+    post:
+      tags: [Accounts]
+      operationId: createAccount
+      summary: Open a new account
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateAccountRequest'
+      responses:
+        '201':
+          description: Account created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccountResponse'
+        '400':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Customer not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/accounts/{id}:
+    get:
+      tags: [Accounts]
+      operationId: getAccount
+      summary: Get an account by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Account found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccountResponse'
+        '404':
+          description: Account not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/accounts/{id}/balance:
+    get:
+      tags: [Accounts]
+      operationId: getBalance
+      summary: Get account balance
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Current balance
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BalanceResponse'
+        '404':
+          description: Account not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/accounts/{id}/transactions:
+    get:
+      tags: [Transactions]
+      operationId: getTransactionHistory
+      summary: Get transaction history for an account
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Transaction history
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TransactionResponse'
+        '404':
+          description: Account not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/accounts/{id}/deposit:
+    post:
+      tags: [Transactions]
+      operationId: deposit
+      summary: Deposit funds into an account
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TransactionRequest'
+      responses:
+        '200':
+          description: Deposit completed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransactionResponse'
+        '400':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Account not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/accounts/{id}/withdraw:
+    post:
+      tags: [Transactions]
+      operationId: withdraw
+      summary: Withdraw funds from an account
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TransactionRequest'
+      responses:
+        '200':
+          description: Withdrawal completed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransactionResponse'
+        '400':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Account not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Insufficient funds
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/transfers:
+    post:
+      tags: [Transactions]
+      operationId: transfer
+      summary: Transfer funds between accounts
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TransferRequest'
+      responses:
+        '201':
+          description: Transfer completed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransactionResponse'
+        '400':
+          description: Validation error or same account
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Account not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Insufficient funds
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
 
 components:
   schemas:
-    GreetingResponse:
+    CreateCustomerRequest:
       type: object
-      description: JSON body returned by greeting endpoints.
-      required:
-        - message
+      required: [firstName, lastName, email, phoneNumber]
       properties:
+        firstName:
+          type: string
+          example: John
+        lastName:
+          type: string
+          example: Doe
+        email:
+          type: string
+          format: email
+          example: john.doe@example.com
+        phoneNumber:
+          type: string
+          example: "555-0101"
+
+    UpdateCustomerRequest:
+      type: object
+      properties:
+        firstName:
+          type: string
+        lastName:
+          type: string
+        email:
+          type: string
+          format: email
+        phoneNumber:
+          type: string
+
+    CustomerResponse:
+      type: object
+      required: [id, firstName, lastName, email, phoneNumber, createdAt]
+      properties:
+        id:
+          type: integer
+          format: int64
+        firstName:
+          type: string
+        lastName:
+          type: string
+        email:
+          type: string
+        phoneNumber:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+
+    CreateAccountRequest:
+      type: object
+      required: [customerId, accountType]
+      properties:
+        customerId:
+          type: integer
+          format: int64
+        accountType:
+          $ref: '#/components/schemas/AccountType'
+
+    AccountResponse:
+      type: object
+      required: [id, accountNumber, accountType, balance, customerId, customerName, createdAt]
+      properties:
+        id:
+          type: integer
+          format: int64
+        accountNumber:
+          type: string
+        accountType:
+          $ref: '#/components/schemas/AccountType'
+        balance:
+          type: number
+          format: decimal
+        customerId:
+          type: integer
+          format: int64
+        customerName:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+
+    BalanceResponse:
+      type: object
+      required: [accountId, accountNumber, balance, asOf]
+      properties:
+        accountId:
+          type: integer
+          format: int64
+        accountNumber:
+          type: string
+        balance:
+          type: number
+          format: decimal
+        asOf:
+          type: string
+          format: date-time
+
+    TransactionRequest:
+      type: object
+      required: [amount]
+      properties:
+        amount:
+          type: number
+          format: decimal
+          minimum: 0.01
+        description:
+          type: string
+
+    TransferRequest:
+      type: object
+      required: [sourceAccountId, targetAccountId, amount]
+      properties:
+        sourceAccountId:
+          type: integer
+          format: int64
+        targetAccountId:
+          type: integer
+          format: int64
+        amount:
+          type: number
+          format: decimal
+          minimum: 0.01
+        description:
+          type: string
+
+    TransactionResponse:
+      type: object
+      required: [id, transactionType, amount, balanceAfter, accountId, accountNumber, createdAt]
+      properties:
+        id:
+          type: integer
+          format: int64
+        transactionType:
+          $ref: '#/components/schemas/TransactionType'
+        amount:
+          type: number
+          format: decimal
+        description:
+          type: string
+        balanceAfter:
+          type: number
+          format: decimal
+        accountId:
+          type: integer
+          format: int64
+        accountNumber:
+          type: string
+        relatedAccountId:
+          type: integer
+          format: int64
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+
+    ErrorResponse:
+      type: object
+      required: [status, error, message, timestamp, path]
+      properties:
+        status:
+          type: integer
+        error:
+          type: string
         message:
           type: string
-          description: Formatted greeting text shown to the caller.
-          example: "Hello, World!"
+        timestamp:
+          type: string
+          format: date-time
+        path:
+          type: string
+        fieldErrors:
+          type: array
+          nullable: true
+          items:
+            $ref: '#/components/schemas/FieldError'
+
+    FieldError:
+      type: object
+      required: [field, message]
+      properties:
+        field:
+          type: string
+        message:
+          type: string
+
+    AccountType:
+      type: string
+      enum: [CHECKING, SAVINGS]
+
+    TransactionType:
+      type: string
+      enum: [DEPOSIT, WITHDRAWAL, TRANSFER]
+
+  securitySchemes:
+    basicAuth:
+      type: http
+      scheme: basic
+
+security:
+  - basicAuth: []

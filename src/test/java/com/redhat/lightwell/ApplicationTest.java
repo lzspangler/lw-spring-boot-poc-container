@@ -2,16 +2,12 @@ package com.redhat.lightwell;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.test.context.support.WithMockUser;
 
-/**
- * Verifies that the Spring application context loads successfully.
- */
 @SpringBootTest
+@WithMockUser
 class ApplicationTest {
 
-    /**
-     * Ensures all beans and configuration required for startup are present.
-     */
     @Test
     void contextLoads() {
     }
