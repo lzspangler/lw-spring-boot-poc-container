@@ -13,11 +13,15 @@ import com.redhat.lightwell.model.dto.TransactionResponse;
 import com.redhat.lightwell.model.dto.TransferRequest;
 import com.redhat.lightwell.repository.AccountRepository;
 import com.redhat.lightwell.repository.TransactionRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class TransactionService {
+
+    private static final Logger log = LoggerFactory.getLogger(TransactionService.class);
 
     private final AccountRepository accountRepository;
     private final TransactionRepository transactionRepository;
@@ -33,6 +37,7 @@ public class TransactionService {
 
     @Transactional
     public TransactionResponse deposit(Long accountId, TransactionRequest request) {
+        log.info("Deposit of {} to account {} - {}", request.getAmount(), accountId, request.getDescription());
         Account account = accountRepository.findById(accountId)
                 .orElseThrow(() -> new ResourceNotFoundException("Account", accountId));
 
@@ -52,10 +57,13 @@ public class TransactionService {
 
     @Transactional
     public TransactionResponse withdraw(Long accountId, TransactionRequest request) {
+        log.info("Withdrawal of {} from account {} - {}", request.getAmount(), accountId, request.getDescription());
         Account account = accountRepository.findById(accountId)
                 .orElseThrow(() -> new ResourceNotFoundException("Account", accountId));
 
         if (account.getBalance().compareTo(request.getAmount()) < 0) {
+            log.warn("Insufficient funds in account {}: balance={}, requested={}",
+                    account.getAccountNumber(), account.getBalance(), request.getAmount());
             throw new InsufficientFundsException(accountId, request.getAmount(), account.getBalance());
         }
 
@@ -75,6 +83,9 @@ public class TransactionService {
 
     @Transactional
     public TransactionResponse transfer(TransferRequest request) {
+        log.info("Transfer of {} from account {} to account {} - {}",
+                request.getAmount(), request.getSourceAccountId(),
+                request.getTargetAccountId(), request.getDescription());
         if (request.getSourceAccountId().equals(request.getTargetAccountId())) {
             throw new IllegalArgumentException("Source and target accounts must be different");
         }

@@ -9,12 +9,16 @@ import com.redhat.lightwell.model.dto.CreateCustomerRequest;
 import com.redhat.lightwell.model.dto.CustomerResponse;
 import com.redhat.lightwell.model.dto.UpdateCustomerRequest;
 import com.redhat.lightwell.repository.CustomerRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 @Service
 public class CustomerService {
+
+    private static final Logger log = LoggerFactory.getLogger(CustomerService.class);
 
     private final CustomerRepository customerRepository;
 
@@ -23,9 +27,12 @@ public class CustomerService {
     }
 
     public List<CustomerResponse> findAll() {
-        return customerRepository.findAll().stream()
+        log.info("Retrieving all customers");
+        List<CustomerResponse> customers = customerRepository.findAll().stream()
                 .map(this::toResponse)
                 .collect(Collectors.toList());
+        log.info("Found {} customers", customers.size());
+        return customers;
     }
 
     public CustomerResponse findById(Long id) {
@@ -36,7 +43,10 @@ public class CustomerService {
 
     @Transactional
     public CustomerResponse create(CreateCustomerRequest request) {
+        log.info("Creating customer: {} {} with email {}", request.getFirstName(),
+                request.getLastName(), request.getEmail());
         if (customerRepository.existsByEmail(request.getEmail())) {
+            log.warn("Duplicate email detected: {}", request.getEmail());
             throw new DuplicateResourceException("Customer", "email", request.getEmail());
         }
         Customer customer = new Customer(
@@ -45,6 +55,8 @@ public class CustomerService {
                 request.getEmail(),
                 request.getPhoneNumber());
         customer = customerRepository.save(customer);
+        log.info("Customer created with id {}: {} {}", customer.getId(),
+                customer.getFirstName(), customer.getLastName());
         return toResponse(customer);
     }
 

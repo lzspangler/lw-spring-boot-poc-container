@@ -12,11 +12,15 @@ import com.redhat.lightwell.model.dto.BalanceResponse;
 import com.redhat.lightwell.model.dto.CreateAccountRequest;
 import com.redhat.lightwell.repository.AccountRepository;
 import com.redhat.lightwell.repository.CustomerRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class AccountService {
+
+    private static final Logger log = LoggerFactory.getLogger(AccountService.class);
 
     private final AccountRepository accountRepository;
     private final CustomerRepository customerRepository;
@@ -46,12 +50,16 @@ public class AccountService {
 
     @Transactional
     public AccountResponse create(CreateAccountRequest request) {
+        log.info("Creating {} account for customer {}", request.getAccountType(), request.getCustomerId());
         Customer customer = customerRepository.findById(request.getCustomerId())
                 .orElseThrow(() -> new ResourceNotFoundException("Customer", request.getCustomerId()));
 
         String accountNumber = generateAccountNumber();
         Account account = new Account(accountNumber, request.getAccountType(), BigDecimal.ZERO, customer);
         account = accountRepository.save(account);
+
+        log.info("Account {} created for customer {} {}", accountNumber,
+                customer.getFirstName(), customer.getLastName());
 
         auditService.log("ACCOUNT_CREATED", "Account", account.getId(),
                 "Created " + request.getAccountType() + " account " + accountNumber
