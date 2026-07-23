@@ -24,6 +24,7 @@ public class SecurityConfig {
                         "/openapi/**").permitAll()
                 .antMatchers("/actuator/health/**", "/actuator/info").permitAll()
                 .antMatchers("/h2-console/**").permitAll()
+                .antMatchers("/api/admin/**").hasRole("ADMIN")
                 .antMatchers("/api/**").authenticated()
                 .anyRequest().authenticated()
             )

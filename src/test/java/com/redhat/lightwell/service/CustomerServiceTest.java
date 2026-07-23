@@ -6,6 +6,7 @@ import com.redhat.lightwell.exception.ResourceNotFoundException;
 import com.redhat.lightwell.model.Customer;
 import com.redhat.lightwell.model.dto.CreateCustomerRequest;
 import com.redhat.lightwell.model.dto.CustomerResponse;
+import com.redhat.lightwell.model.dto.UpdateCustomerRequest;
 import com.redhat.lightwell.repository.CustomerRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -70,5 +71,38 @@ class CustomerServiceTest {
 
         assertThatThrownBy(() -> customerService.findById(99L))
                 .isInstanceOf(ResourceNotFoundException.class);
+    }
+
+    @Test
+    void shouldUpdateAllFields() {
+        Customer customer = new Customer("John", "Doe", "john@example.com", "555-0101");
+        when(customerRepository.findById(1L)).thenReturn(Optional.of(customer));
+        when(customerRepository.existsByEmail("newemail@example.com")).thenReturn(false);
+        when(customerRepository.save(any(Customer.class))).thenReturn(customer);
+
+        UpdateCustomerRequest request = new UpdateCustomerRequest();
+        request.setFirstName("Jonathan");
+        request.setLastName("Smith");
+        request.setEmail("newemail@example.com");
+        request.setPhoneNumber("555-9999");
+
+        CustomerResponse response = customerService.update(1L, request);
+
+        assertThat(response.getFirstName()).isEqualTo("Jonathan");
+        assertThat(response.getLastName()).isEqualTo("Smith");
+    }
+
+    @Test
+    void shouldUpdateWithSameEmailWithoutDuplicateCheck() {
+        Customer customer = new Customer("John", "Doe", "john@example.com", "555-0101");
+        when(customerRepository.findById(1L)).thenReturn(Optional.of(customer));
+        when(customerRepository.save(any(Customer.class))).thenReturn(customer);
+
+        UpdateCustomerRequest request = new UpdateCustomerRequest();
+        request.setEmail("john@example.com");
+
+        CustomerResponse response = customerService.update(1L, request);
+
+        assertThat(response.getEmail()).isEqualTo("john@example.com");
     }
 }

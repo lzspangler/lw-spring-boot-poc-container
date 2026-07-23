@@ -17,7 +17,7 @@ public class DataQueryService {
     }
 
     public Map<String, Object> query(String jsonData, String expression) {
-        JSONParser parser = new JSONParser(JSONParser.DEFAULT_PERMISSIVE_MODE);
+        JSONParser parser = new JSONParser(JSONParser.MODE_RFC4627);
 
         try {
             Object parsed = parser.parse(jsonData);

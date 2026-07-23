@@ -60,6 +60,24 @@ class ConfigImportIntegrationTest {
 
     @Test
     @Order(4)
+    void shouldDenyUserRoleOnConfigImport() throws Exception {
+        mockMvc.perform(post("/api/admin/config")
+                        .with(httpBasic("user", "user123"))
+                        .contentType("text/x-yaml")
+                        .content("key: value\n"))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    @Order(5)
+    void shouldDenyUserRoleOnConfigRead() throws Exception {
+        mockMvc.perform(get("/api/admin/config")
+                        .with(httpBasic("user", "user123")))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    @Order(6)
     void shouldMergeMultipleImports() throws Exception {
         String yaml = "feature:\n  enabled: true\n";
 
