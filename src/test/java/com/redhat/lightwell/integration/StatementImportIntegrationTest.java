@@ -72,6 +72,15 @@ class StatementImportIntegrationTest {
     }
 
     @Test
+    void shouldReturn500ForMalformedXml() throws Exception {
+        mockMvc.perform(post("/api/accounts/1/import-statement")
+                        .with(httpBasic("admin", "admin123"))
+                        .contentType(MediaType.APPLICATION_XML)
+                        .content("<<<not valid xml>>>"))
+                .andExpect(status().isInternalServerError());
+    }
+
+    @Test
     void shouldReturn404ForNonExistentAccount() throws Exception {
         mockMvc.perform(post("/api/accounts/999/import-statement")
                         .with(httpBasic("admin", "admin123"))

@@ -57,12 +57,30 @@ class DataQueryIntegrationTest {
     }
 
     @Test
+    void shouldDenyUserRoleOnAdminQuery() throws Exception {
+        mockMvc.perform(post("/api/admin/query")
+                        .with(httpBasic("user", "user123"))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"data\":\"{}\",\"expression\":\"$.x\"}"))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
     void shouldReturn400WhenDataIsNull() throws Exception {
         mockMvc.perform(post("/api/admin/query")
                         .with(httpBasic("admin", "admin123"))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"data\":null,\"expression\":\"$.name\"}"))
                 .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void shouldReturn500ForMalformedJsonData() throws Exception {
+        mockMvc.perform(post("/api/admin/query")
+                        .with(httpBasic("admin", "admin123"))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"data\":\"<<<not json>>>\",\"expression\":\"$.x\"}"))
+                .andExpect(status().isInternalServerError());
     }
 
     @Test

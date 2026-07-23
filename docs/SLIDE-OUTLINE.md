@@ -81,7 +81,7 @@ Remediate CVEs. Stay on your current version. Ship with confidence.
 
 - One script to apply: `./apply-rhlw-version.sh`
 - One script to revert: `./revert-rhlw-version.sh`
-- All 80 tests pass on both versions
+- All 121 tests pass on both versions
 - Binary-compatible — no recompilation of your source code needed
 
 ---
@@ -107,7 +107,7 @@ Remediate CVEs. Stay on your current version. Ship with confidence.
 - Show the pom.xml diff — only version suffixes changed
 - Re-run **Red Hat Dependency Analytics** scan
 - Show CVE count: **significantly reduced**
-- Same application. Same Spring Boot 2.7.18 base. Same Java 17. Same 80 passing tests.
+- Same application. Same Spring Boot 2.7.18 base. Same Java 17. Same 121 passing tests.
 - The application still does everything it did before:
   - Customer management and account operations
   - Fund transfers and transaction history

@@ -23,7 +23,7 @@ Before the demo:
 5. **Build verified** before demo:
    ```bash
    mvn -s settings.xml clean verify
-   # Should show: Tests run: 80, Failures: 0, BUILD SUCCESS
+   # Should show: Tests run: 121, Failures: 0, BUILD SUCCESS
    ```
 
 ---
@@ -190,7 +190,7 @@ Expected output:
 mvn -s settings.xml clean verify -U
 ```
 
-> "All 80 tests pass. Same application, same behavior, fewer vulnerabilities.
+> "All 121 tests pass. Same application, same behavior, fewer vulnerabilities.
 > The `-U` flag forces Maven to pull the remediated artifacts from the
 > Lightwell repository."
 

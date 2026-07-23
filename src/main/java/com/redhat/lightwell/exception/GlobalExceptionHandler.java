@@ -77,4 +77,16 @@ public class GlobalExceptionHandler {
                 request.getRequestURI(),
                 null);
     }
+
+    @ExceptionHandler(RuntimeException.class)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public ErrorResponse handleRuntimeException(RuntimeException ex, HttpServletRequest request) {
+        return new ErrorResponse(
+                HttpStatus.INTERNAL_SERVER_ERROR.value(),
+                "Internal Server Error",
+                ex.getMessage(),
+                LocalDateTime.now(),
+                request.getRequestURI(),
+                null);
+    }
 }
