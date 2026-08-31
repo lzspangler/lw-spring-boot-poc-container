@@ -1,6 +1,0 @@
-Based on this project, create a more FSI-specific demo that showcases how Lightwell remediated patching of SpringBoot 2.7.18 dependencies significantly
-reduces the number of CVE's in this project.  There are two scripts - revert-rhlw-version.sh and apply-rhlw-version.sh that allow you to switch between
-remediated and non-remediated pom.xml files.  Keep this format.  Also create a suitable slide outline and demo script to showcase the value of
-Red Hat Lightwell.  For the demo, we'll be using the VSCode plugin for Red Hat Dependency Analytics Report, which details all the CVE's based in the
-current project (pom.xml). Keep in mind that we want to stick to SB version 2.7.18 and demonstrate that the Lightwell remediated fixes allow you to       
-  remain on that version of SpringBoot
